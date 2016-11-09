@@ -1,7 +1,9 @@
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication
+from PyQt5 import QtWidgets
+from PyQt5 import QtCore
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
 import sys
+import telnetlib
+import time
 import MyPythonWindow
 
 
@@ -9,6 +11,89 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
     def __init__(self, parent=None):
         super(MyApp, self).__init__(parent)
         self.setupUi(self)
+
+        # Button Functionality.
+        self.buttonAddItemToList.clicked.connect(self.buttonAddClicked)
+        self.buttonCancel.clicked.connect(self.buttonQuitApp)
+        self.buttonRemoveItemFromList.clicked.connect(self.buttonRemoveChecked)
+        self.model = QStandardItemModel(self.listView)
+        self.listView.setModel(self.model)
+        self.buttonSendCommand.clicked.connect(self.run_telnet_connection)
+
+    def buttonAddClicked(self):
+        # ToDo: If self.lineEditCommand.text() is empty string don't add it to the list.
+        # ToDo: Add some sort of feedback to let the user know that the lineEditCommand is empty.
+        # ToDo: Make key ENTER add items to the list.
+        _getTextFromLineEditHost = self.lineEditHost.text()
+        item = QStandardItem()
+        item.setText(_getTextFromLineEditHost)
+        print(item.text())
+        item.setAccessibleText(_getTextFromLineEditHost)
+        print(item.accessibleText())
+        item.setCheckable(True)
+        self.model.appendRow(item)
+        self.statusBar().showMessage(_getTextFromLineEditHost + ' was added to the list')
+        print(_getTextFromLineEditHost + ' was added to the list')
+
+    def buttonRemoveChecked(self):
+        try:
+            for index in range(self.model.rowCount()):
+                item = self.model.item(index)
+                if item.checkState() == QtCore.Qt.Checked:
+                    self.model.removeRow(index)
+        except AttributeError as error:
+            print(error)
+            pass
+
+    def buttonClicked(self):
+        sender = self.sender()
+        self.statusBar().showMessage(sender.text() + ' was pressed')
+        print(sender.text() + ' was pressed')
+
+    def buttonQuitApp(self):
+        self.statusBar().showMessage('Aplication will now exit.')
+        time.sleep(1)
+        quit()
+
+    def run_telnet_connection(self):
+        _getTextFromLineEditCommand = self.lineEditCommand.text()
+        _getTextFromLineEditPort = self.lineEditPort.text()
+        _getTextFromCountBox = int(self.countBox.text())
+        _getTextFromFrequencyBox = float(self.frequencyBox.text())
+        print(_getTextFromLineEditCommand)
+        print(_getTextFromCountBox)
+        print(_getTextFromFrequencyBox)
+        print(_getTextFromLineEditPort)
+        for pollNum in range(1, _getTextFromCountBox + 1):
+            for index in range(self.model.rowCount()):
+                ipItem = self.model.item(index)
+                ipItemText = ipItem.accessibleText()
+                print(type(ipItemText))
+                if ipItem.checkState() == QtCore.Qt.Checked:
+                    try:
+                        telnet = telnetlib.Telnet(ipItemText, _getTextFromLineEditPort)
+                        telnet.write((_getTextFromLineEditCommand + '\n').encode('UTF-8'))
+                        telnet.close()
+                        print("#{0} Command {1} sent to {2}".format(pollNum, _getTextFromLineEditCommand, ipItemText))
+                    except Exception as e:
+                        print(e)
+                        # print("Could not connect to host: {}".format(ip))
+            if pollNum < _getTextFromCountBox:
+                pollrate = int(_getTextFromFrequencyBox)
+                print("Sleeping for {} seconds".format(pollrate))
+                while pollrate > 0:
+                    minutes, sec = divmod(int(pollrate), 60)
+                    countdown = '{:02d}:{:02d}'.format(minutes, sec)
+                    pollLeft = _getTextFromCountBox - pollNum
+                    if pollLeft > 1:
+                        self.statusBar().showMessage("{} Until next poll.                                            {} polls left".format(countdown, pollLeft))
+                    else:
+                        self.statusBar().showMessage("{} Until next poll.                                            {} poll left".format(countdown, pollLeft))
+                    print(countdown, end='\r')
+                    time.sleep(1)
+                    pollrate -= 1
+        self.statusBar().showMessage("Done!")
+        return 0
 
 
 def main():
