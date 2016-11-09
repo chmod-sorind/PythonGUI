@@ -27,9 +27,7 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         _getTextFromLineEditHost = self.lineEditHost.text()
         item = QStandardItem()
         item.setText(_getTextFromLineEditHost)
-        print(item.text())
         item.setAccessibleText(_getTextFromLineEditHost)
-        print(item.accessibleText())
         item.setCheckable(True)
         self.model.appendRow(item)
         self.statusBar().showMessage(_getTextFromLineEditHost + ' was added to the list')
@@ -60,15 +58,10 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         _getTextFromLineEditPort = self.lineEditPort.text()
         _getTextFromCountBox = int(self.countBox.text())
         _getTextFromFrequencyBox = float(self.frequencyBox.text())
-        print(_getTextFromLineEditCommand)
-        print(_getTextFromCountBox)
-        print(_getTextFromFrequencyBox)
-        print(_getTextFromLineEditPort)
         for pollNum in range(1, _getTextFromCountBox + 1):
             for index in range(self.model.rowCount()):
                 ipItem = self.model.item(index)
                 ipItemText = ipItem.accessibleText()
-                print(type(ipItemText))
                 if ipItem.checkState() == QtCore.Qt.Checked:
                     try:
                         telnet = telnetlib.Telnet(ipItemText, _getTextFromLineEditPort)
@@ -77,21 +70,20 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
                         print("#{0} Command {1} sent to {2}".format(pollNum, _getTextFromLineEditCommand, ipItemText))
                     except Exception as e:
                         print(e)
-                        # print("Could not connect to host: {}".format(ip))
             if pollNum < _getTextFromCountBox:
-                pollrate = int(_getTextFromFrequencyBox)
-                print("Sleeping for {} seconds".format(pollrate))
-                while pollrate > 0:
-                    minutes, sec = divmod(int(pollrate), 60)
+                pollRate = int(_getTextFromFrequencyBox)
+                print("Sleeping for {} seconds".format(pollRate))
+                while pollRate > 0:
+                    minutes, sec = divmod(int(pollRate), 60)
                     countdown = '{:02d}:{:02d}'.format(minutes, sec)
                     pollLeft = _getTextFromCountBox - pollNum
                     if pollLeft > 1:
-                        self.statusBar().showMessage("{} Until next poll.                                            {} polls left".format(countdown, pollLeft))
+                        self.statusBar().showMessage("{} Until next poll. {} polls left".format(countdown, pollLeft))
                     else:
-                        self.statusBar().showMessage("{} Until next poll.                                            {} poll left".format(countdown, pollLeft))
+                        self.statusBar().showMessage("{} Until next poll. {} poll left".format(countdown, pollLeft))
                     print(countdown, end='\r')
                     time.sleep(1)
-                    pollrate -= 1
+                    pollRate -= 1
         self.statusBar().showMessage("Done!")
         return 0
 
