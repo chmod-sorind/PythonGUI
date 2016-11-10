@@ -19,8 +19,7 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.buttonRemoveItemFromList.clicked.connect(self.buttonRemoveChecked)
         self.model = QStandardItemModel(self.listView)
         self.listView.setModel(self.model)
-        self.buttonSendCommand.clicked.connect(self.startTreading())
-        #self.buttonStopTelnet.clicked.connect(self.startTreading)
+        self.buttonSendCommand.clicked.connect(self.startTreading)
 
     def buttonAddClicked(self):
         # ToDo: If self.lineEditCommand.text() is empty string don't add it to the list.
@@ -49,6 +48,11 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         sender = self.sender()
         self.statusBar().showMessage(sender.text() + ' was pressed')
         print(sender.text() + ' was pressed')
+
+    def buttonQuitApp(self):
+        self.statusBar().showMessage('Aplication will now exit.')
+        time.sleep(1)
+        quit()
 
     def run_telnet_connection(self):
         _getTextFromLineEditCommand = self.lineEditCommand.text()
@@ -84,15 +88,9 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.statusBar().showMessage("Done!")
         return 0
 
-    def startThreading(self):
+    def startTreading(self):
         telnetThread = threading.Thread(target=self.run_telnet_connection,)
         telnetThread.start()
-
-    def buttonQuitApp(self):
-        self.statusBar().showMessage('Aplication will now exit.')
-        time.sleep(1)
-        quit()
-
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
