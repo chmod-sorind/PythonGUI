@@ -1,6 +1,9 @@
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
+    QAction, QFileDialog, QApplication)
+from PyQt5.QtGui import QIcon
 import sys
 import telnetlib
 import time
@@ -19,7 +22,8 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.buttonRemoveItemFromList.clicked.connect(self.buttonRemoveChecked)
         self.model = QStandardItemModel(self.listView)
         self.listView.setModel(self.model)
-        self.buttonSendCommand.clicked.connect(self.startTreading)
+        self.buttonSendCommand.clicked.connect(self.startTelnetTreading)
+        self.buttonLoadFile.clicked.connect(self.openFile)
 
     def buttonAddClicked(self):
         # ToDo: If self.lineEditCommand.text() is empty string don't add it to the list.
@@ -70,7 +74,7 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
                         telnet.close()
                         print("#{0} Command {1} sent to {2}".format(pollNum, _getTextFromLineEditCommand, ipItemText))
                     except Exception as e:
-                        print(e)
+                        print("HOST [{0}]: ".format(ipItemText), e)
             if pollNum < _getTextFromCountBox:
                 pollRate = int(_getTextFromFrequencyBox)
                 print("Sleeping for {} seconds".format(pollRate))
@@ -88,9 +92,26 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.statusBar().showMessage("Done!")
         return 0
 
-    def startTreading(self):
+    def startTelnetTreading(self):
         telnetThread = threading.Thread(target=self.run_telnet_connection,)
         telnetThread.start()
+
+    def openFile(self):
+        fileName = QFileDialog.getOpenFileName(self, 'Open file')
+        if fileName[0]:
+            with open(fileName[0]) as IP_LIST:
+                line = IP_LIST.read().splitlines()
+                for f in line:
+                    item = QStandardItem()
+                    item.setText(f)
+                    item.setAccessibleText(f)
+                    item.setCheckable(True)
+                    self.model.appendRow(item)
+        self.statusBar().showMessage("{} loaded...".format(fileName[0]))
+
+
+
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
