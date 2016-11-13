@@ -349,7 +349,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="buttonStartTelnet">
+             <widget class="QPushButton" name="buttonSendCommand">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>

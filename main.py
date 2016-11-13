@@ -1,14 +1,70 @@
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
+from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import *
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
-from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
-    QAction, QFileDialog, QApplication)
-from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QFileDialog
 import sys
 import telnetlib
 import time
 import MyPythonWindow
-import threading
+
+
+class newTelnetThread(QThread):
+    mySignal = pyqtSignal(str)
+
+    def __init__(self, telnetParams, listOfHosts):
+        """
+        Make a new thread instance with the specified
+        telnetParams as the first argument. The telnetParams argument
+        will be stored in an instance variable called telnetParams
+        which then can be accessed by all other class instance functions
+        :param telnetParams: A list of telnet param names
+        :type telnetParams: list
+        """
+        QThread.__init__(self)
+        self.telnetParams = telnetParams
+        self.listOfHosts = listOfHosts
+
+    def __del__(self):
+        self.wait()
+
+    def _run_telnet_connection(self):
+        count = self.telnetParams[0]
+        rate = self.telnetParams[1]
+        port = self.telnetParams[2]
+        command = self.telnetParams[3]
+        for pollNum in range(1, count + 1):
+            for ipHost in self.listOfHosts:
+                    try:
+                        telnet = telnetlib.Telnet(ipHost, port)
+                        telnet.write((command + '\n').encode('UTF-8'))
+                        telnet.close()
+                        print(("#{0} Command {1} sent to {2}".format(pollNum, command, ipHost)))
+                    except Exception as e:
+                        print("HOST [{0}]: ".format(ipHost), e)
+            if pollNum < count:
+                pollRate = int(rate)
+                print("Sleeping for {} seconds".format(pollRate))
+                while pollRate > 0:
+                    minutes, sec = divmod(int(pollRate), 60)
+                    countdown = '{:02d}:{:02d}'.format(minutes, sec)
+                    pollLeft = count - pollNum
+                    if pollLeft > 1:
+                        # self.statusBar().showMessage("{} Until next poll. {} polls left".format(countdown, pollLeft))
+                        print("{} Until next poll. {} polls left".format(countdown, pollLeft))
+                    else:
+                        # self.statusBar().showMessage("{} Until next poll. {} poll left".format(countdown, pollLeft))
+                        print("{} Until next poll. {} poll left".format(countdown, pollLeft))
+                    print(countdown, end='\r')
+                    time.sleep(1)
+                    pollRate -= 1
+        self.buttonStopTelnet.setEnabled(False)
+        self.buttonStartTelnet.setEnabled(True)
+
+    def run(self):
+        self._run_telnet_connection()
+        self.mySignal.emit("finished")
 
 
 class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
@@ -22,21 +78,35 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.buttonRemoveItemFromList.clicked.connect(self.buttonRemoveChecked)
         self.model = QStandardItemModel(self.listView)
         self.listView.setModel(self.model)
-        self.buttonSendCommand.clicked.connect(self.startTelnetTreading)
+        self.buttonStartTelnet.clicked.connect(self.startTelnetTreading)
+        self.buttonStopTelnet.clicked.connect(self.stopTelnetThreading)
         self.buttonLoadFile.clicked.connect(self.openFile)
+        self.checkBoxCheckAll.stateChanged.connect(self.CheckUncheckAll)
 
     def buttonAddClicked(self):
         # ToDo: If self.lineEditCommand.text() is empty string don't add it to the list.
         # ToDo: Add some sort of feedback to let the user know that the lineEditCommand is empty.
         # ToDo: Make key ENTER add items to the list.
         _getTextFromLineEditHost = self.lineEditHost.text()
-        item = QStandardItem()
-        item.setText(_getTextFromLineEditHost)
-        item.setAccessibleText(_getTextFromLineEditHost)
-        item.setCheckable(True)
-        self.model.appendRow(item)
-        self.statusBar().showMessage(_getTextFromLineEditHost + ' was added to the list')
-        print(_getTextFromLineEditHost + ' was added to the list')
+        if _getTextFromLineEditHost:
+            item = QStandardItem()
+            item.setText(_getTextFromLineEditHost)
+            item.setAccessibleText(_getTextFromLineEditHost)
+            item.setCheckable(True)
+            self.model.appendRow(item)
+            self.lineEditHost.clear()
+            self.statusBar().showMessage(_getTextFromLineEditHost + ' was added to the list')
+            print(_getTextFromLineEditHost + ' was added to the list')
+        else:
+            self.statusBar().showMessage('Nothing to add')
+
+    def CheckUncheckAll(self):
+        for index in range(self.model.rowCount()):
+            item = self.model.item(index)
+            if self.checkBoxCheckAll.isChecked():
+                item.setCheckState(QtCore.Qt.Checked)
+            else:
+                item.setCheckState(QtCore.Qt.Unchecked)
 
     def buttonRemoveChecked(self):
         try:
@@ -58,46 +128,36 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         time.sleep(1)
         quit()
 
-    def run_telnet_connection(self):
-        _getTextFromLineEditCommand = self.lineEditCommand.text()
-        _getTextFromLineEditPort = self.lineEditPort.text()
-        _getTextFromCountBox = int(self.countBox.text())
-        _getTextFromFrequencyBox = float(self.frequencyBox.text())
-        for pollNum in range(1, _getTextFromCountBox + 1):
-            for index in range(self.model.rowCount()):
-                ipItem = self.model.item(index)
-                ipItemText = ipItem.accessibleText()
-                if ipItem.checkState() == QtCore.Qt.Checked:
-                    try:
-                        telnet = telnetlib.Telnet(ipItemText, _getTextFromLineEditPort)
-                        telnet.write((_getTextFromLineEditCommand + '\n').encode('UTF-8'))
-                        telnet.close()
-                        print("#{0} Command {1} sent to {2}".format(pollNum, _getTextFromLineEditCommand, ipItemText))
-                    except Exception as e:
-                        print("HOST [{0}]: ".format(ipItemText), e)
-            if pollNum < _getTextFromCountBox:
-                pollRate = int(_getTextFromFrequencyBox)
-                print("Sleeping for {} seconds".format(pollRate))
-                while pollRate > 0:
-                    minutes, sec = divmod(int(pollRate), 60)
-                    countdown = '{:02d}:{:02d}'.format(minutes, sec)
-                    pollLeft = _getTextFromCountBox - pollNum
-                    if pollLeft > 1:
-                        self.statusBar().showMessage("{} Until next poll. {} polls left".format(countdown, pollLeft))
-                    else:
-                        self.statusBar().showMessage("{} Until next poll. {} poll left".format(countdown, pollLeft))
-                    print(countdown, end='\r')
-                    time.sleep(1)
-                    pollRate -= 1
-        self.statusBar().showMessage("Done!")
-        return 0
 
     def startTelnetTreading(self):
-        telnetThread = threading.Thread(target=self.run_telnet_connection,)
-        telnetThread.start()
+        _com = str(self.lineEditCommand.text())
+        _port = str(self.lineEditPort.text())
+        _count = int(self.countBox.text())
+        _rate = float(self.frequencyBox.text())
+        telnetParams_list = [_count, _rate, _port, _com]
+
+        ipHosts_list = []
+        for index in range(self.model.rowCount()):
+            ipItem = self.model.item(index)
+            ipItemText = ipItem.accessibleText()
+            if ipItem.checkState() == QtCore.Qt.Checked:
+                ipHosts_list.append(ipItemText)
+
+        print(ipHosts_list)
+
+        self.get_thread = newTelnetThread(telnetParams_list, ipHosts_list)
+        self.get_thread.start()
+        self.buttonStopTelnet.setEnabled(True)
+        #self.get_thread. pyqtSignal(newTelnetThread.mySignal()), self.stopTelnetThreading
+        self.buttonStopTelnet.clicked.connect(self.get_thread.terminate)
+        self.buttonStartTelnet.setEnabled(False)
+
+    def stopTelnetThreading(self):
+        self.buttonStopTelnet.setEnabled(False)
+        self.buttonStartTelnet.setEnabled(True)
 
     def openFile(self):
-        fileName = QFileDialog.getOpenFileName(self, 'Open file')
+        fileName = QFileDialog.getOpenFileName(self, 'Load file')
         if fileName[0]:
             with open(fileName[0]) as IP_LIST:
                 line = IP_LIST.read().splitlines()
@@ -108,9 +168,6 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
                     item.setCheckable(True)
                     self.model.appendRow(item)
         self.statusBar().showMessage("{} loaded...".format(fileName[0]))
-
-
-
 
 
 def main():
