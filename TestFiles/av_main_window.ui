@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AVMainWindow</class>
+ <widget class="QMainWindow" name="AVMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>635</width>
+    <height>477</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>AV Player</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff/>
+   </iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="margin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QFrame" name="m_frame">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>635</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="m_openAction"/>
+    <addaction name="separator"/>
+    <addaction name="m_exitAction"/>
+   </widget>
+   <widget class="QMenu" name="menu_Window">
+    <property name="title">
+     <string>&amp;Window</string>
+    </property>
+    <addaction name="m_fullScreenAction"/>
+    <addaction name="m_showPlaylistAction"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="m_aboutAction"/>
+   </widget>
+   <widget class="QMenu" name="menu_Action">
+    <property name="title">
+     <string>&amp;Action</string>
+    </property>
+    <addaction name="m_pauseAction"/>
+    <addaction name="m_stopAction"/>
+    <addaction name="m_ffAction"/>
+    <addaction name="m_rwAction"/>
+    <addaction name="m_nextAction"/>
+    <addaction name="m_prevAction"/>
+    <addaction name="m_speedAction"/>
+   </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <widget class="QMenu" name="menuSynchronization_2">
+     <property name="title">
+      <string>Synchronization</string>
+     </property>
+     <addaction name="m_noneAction"/>
+     <addaction name="m_masterAction"/>
+     <addaction name="m_slaveAction"/>
+    </widget>
+    <widget class="QMenu" name="menuVideoStrategy">
+     <property name="title">
+      <string>Video Strategy</string>
+     </property>
+    </widget>
+    <addaction name="m_repeatContentAction"/>
+    <addaction name="m_keepAspectRatioAction"/>
+    <addaction name="m_hardwareAccelerationAction"/>
+    <addaction name="separator"/>
+    <addaction name="menuSynchronization_2"/>
+    <addaction name="separator"/>
+    <addaction name="menuVideoStrategy"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Action"/>
+   <addaction name="menuSettings"/>
+   <addaction name="menu_Window"/>
+   <addaction name="menu_Help"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="m_openAction">
+   <property name="icon">
+    <iconset resource="../images/av_images.qrc">
+     <normaloff>:/images/16x16/fileopen.png</normaloff>:/images/16x16/fileopen.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open...</string>
+   </property>
+   <property name="iconText">
+    <string>Open</string>
+   </property>
+   <property name="toolTip">
+    <string>Open</string>
+   </property>
+   <property name="statusTip">
+    <string/>
+   </property>
+   <property name="whatsThis">
+    <string/>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="m_exitAction">
+   <property name="icon">
+    <iconset resource="../images/av_images.qrc">
+     <normaloff>:/images/16x16/exit.png</normaloff>:/images/16x16/exit.png</iconset>
+   </property>
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+  </action>
+  <action name="m_pauseAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../images/av_images.qrc">
+     <normaloff>:/images/16x16/pause.png</normaloff>:/images/16x16/pause.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Pause</string>
+   </property>
+   <property name="shortcut">
+    <string>Space</string>
+   </property>
+  </action>
+  <action name="m_repeatContentAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Repea&amp;t</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="m_stopAction">
+   <property name="icon">
+    <iconset resource="../images/av_images.qrc">
+     <normaloff>:/images/16x16/stop.png</normaloff>:/images/16x16/stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Stop</string>
+   </property>
+   <property name="shortcut">
+    <string>End</string>
+   </property>
+  </action>
+  <action name="m_aboutAction">
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="m_fullScreenAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../images/av_images.qrc">
+     <normaloff>:/images/16x16/fullscreen.png</normaloff>:/images/16x16/fullscreen.png</iconset>
+   </property>
+   <property name="text">
+    <string>F&amp;ull Screen</string>
+   </property>
+   <property name="iconText">
+    <string>Full Screen</string>
+   </property>
+   <property name="toolTip">
+    <string>Full Screen</string>
+   </property>
+   <property name="statusTip">
+    <string/>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+F</string>
+   </property>
+  </action>
+  <action name="m_nextAction">
+   <property name="icon">
+    <iconset resource="../images/av_images.qrc">
+     <normaloff>:/images/16x16/down.png</normaloff>:/images/16x16/down.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ne&amp;xt</string>
+   </property>
+   <property name="shortcut">
+    <string>Down</string>
+   </property>
+  </action>
+  <action name="m_prevAction">
+   <property name="icon">
+    <iconset resource="../images/av_images.qrc">
+     <normaloff>:/images/16x16/up.png</normaloff>:/images/16x16/up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pre&amp;vious</string>
+   </property>
+   <property name="shortcut">
+    <string>Up</string>
+   </property>
+  </action>
+  <action name="m_showPlaylistAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show P&amp;laylist</string>
+   </property>
+  </action>
+  <action name="m_slaveAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Slave</string>
+   </property>
+  </action>
+  <action name="m_masterAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Master</string>
+   </property>
+  </action>
+  <action name="m_noneAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>None</string>
+   </property>
+  </action>
+  <action name="m_ffAction">
+   <property name="icon">
+    <iconset resource="../images/av_images.qrc">
+     <normaloff>:/images/16x16/fforward.png</normaloff>:/images/16x16/fforward.png</iconset>
+   </property>
+   <property name="text">
+    <string>Fast Forward</string>
+   </property>
+   <property name="shortcut">
+    <string>Right</string>
+   </property>
+  </action>
+  <action name="m_rwAction">
+   <property name="icon">
+    <iconset resource="../images/av_images.qrc">
+     <normaloff>:/images/16x16/rewind.png</normaloff>:/images/16x16/rewind.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rewind</string>
+   </property>
+   <property name="shortcut">
+    <string>Left</string>
+   </property>
+  </action>
+  <action name="actionTest">
+   <property name="text">
+    <string>Test</string>
+   </property>
+  </action>
+  <action name="m_keepAspectRatioAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Keep Aspect Ratio</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+K</string>
+   </property>
+  </action>
+  <action name="m_speedAction">
+   <property name="text">
+    <string>Set Playback Speed</string>
+   </property>
+  </action>
+  <action name="m_hardwareAccelerationAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Hardware Acceleration</string>
+   </property>
+  </action>
+  <action name="actionOutput_Strategy">
+   <property name="text">
+    <string>Output Strategy</string>
+   </property>
+  </action>
+  <action name="actionHardware_Overlay">
+   <property name="text">
+    <string>Hardware Overlay</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../images/av_images.qrc"/>
+ </resources>
+ <connections/>
+</ui>

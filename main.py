@@ -11,7 +11,7 @@ import MyPythonWindow
 
 
 class newTelnetThread(QThread):
-    mySignal = pyqtSignal(str)
+    finishedSignal = pyqtSignal()
 
     def __init__(self, telnetParams, listOfHosts):
         """
@@ -34,6 +34,7 @@ class newTelnetThread(QThread):
         rate = self.telnetParams[1]
         port = self.telnetParams[2]
         command = self.telnetParams[3]
+        print(self.telnetParams)
         for pollNum in range(1, count + 1):
             for ipHost in self.listOfHosts:
                     try:
@@ -49,22 +50,22 @@ class newTelnetThread(QThread):
                 while pollRate > 0:
                     minutes, sec = divmod(int(pollRate), 60)
                     countdown = '{:02d}:{:02d}'.format(minutes, sec)
-                    pollLeft = count - pollNum
-                    if pollLeft > 1:
-                        # self.statusBar().showMessage("{} Until next poll. {} polls left".format(countdown, pollLeft))
-                        print("{} Until next poll. {} polls left".format(countdown, pollLeft))
-                    else:
-                        # self.statusBar().showMessage("{} Until next poll. {} poll left".format(countdown, pollLeft))
-                        print("{} Until next poll. {} poll left".format(countdown, pollLeft))
+                    #pollLeft = count - pollNum
+                    #if pollLeft > 1:
+                        #self.statusBar().showMessage("{} Until next poll. {} polls left".format(countdown, pollLeft))
+                        #print("{} Until next poll. {} polls left".format(countdown, pollLeft), end='\r')
+                    #else:
+                        #self.statusBar().showMessage("{} Until next poll. {} poll left".format(countdown, pollLeft))
+                        #print("{} Until next poll. {} poll left".format(countdown, pollLeft), end='\r')
                     print(countdown, end='\r')
                     time.sleep(1)
                     pollRate -= 1
-        self.buttonStopTelnet.setEnabled(False)
-        self.buttonStartTelnet.setEnabled(True)
+        #self.buttonStopTelnet.setEnabled(False)
+        #self.buttonStartTelnet.setEnabled(True)
 
     def run(self):
         self._run_telnet_connection()
-        self.mySignal.emit("finished")
+        self.finishedSignal.emit()
 
 
 class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
@@ -84,8 +85,6 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.checkBoxCheckAll.stateChanged.connect(self.CheckUncheckAll)
 
     def buttonAddClicked(self):
-        # ToDo: If self.lineEditCommand.text() is empty string don't add it to the list.
-        # ToDo: Add some sort of feedback to let the user know that the lineEditCommand is empty.
         # ToDo: Make key ENTER add items to the list.
         _getTextFromLineEditHost = self.lineEditHost.text()
         if _getTextFromLineEditHost:
@@ -143,12 +142,10 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
             if ipItem.checkState() == QtCore.Qt.Checked:
                 ipHosts_list.append(ipItemText)
 
-        print(ipHosts_list)
-
         self.get_thread = newTelnetThread(telnetParams_list, ipHosts_list)
         self.get_thread.start()
         self.buttonStopTelnet.setEnabled(True)
-        #self.get_thread. pyqtSignal(newTelnetThread.mySignal()), self.stopTelnetThreading
+        self.get_thread.finishedSignal.connect(self.stopTelnetThreading)
         self.buttonStopTelnet.clicked.connect(self.get_thread.terminate)
         self.buttonStartTelnet.setEnabled(False)
 
