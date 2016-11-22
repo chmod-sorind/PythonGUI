@@ -259,6 +259,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Telnet Tools"))
         self.lineEditHost.setPlaceholderText(_translate("MainWindow", "hostname"))
+        self.lineEditHost
         self.buttonAddItemToList.setText(_translate("MainWindow", "Add Host"))
         self.buttonRemoveItemFromList.setText(_translate("MainWindow", "Remove Host"))
         self.labelCount.setText(_translate("MainWindow", "Poll Count"))

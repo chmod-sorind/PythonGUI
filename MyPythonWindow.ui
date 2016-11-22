@@ -142,6 +142,21 @@
                 <height>27</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string/>
+              </property>
+              <property name="statusTip">
+               <string/>
+              </property>
+              <property name="whatsThis">
+               <string/>
+              </property>
+              <property name="accessibleName">
+               <string/>
+              </property>
+              <property name="accessibleDescription">
+               <string/>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -490,6 +505,12 @@
                 <width>315</width>
                 <height>300</height>
                </size>
+              </property>
+              <property name="whatsThis">
+               <string/>
+              </property>
+              <property name="inputMethodHints">
+               <set>Qt::ImhNone</set>
               </property>
               <property name="frameShape">
                <enum>QFrame::WinPanel</enum>

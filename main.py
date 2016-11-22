@@ -60,8 +60,6 @@ class newTelnetThread(QThread):
                     print(countdown, end='\r')
                     time.sleep(1)
                     pollRate -= 1
-        #self.buttonStopTelnet.setEnabled(False)
-        #self.buttonStartTelnet.setEnabled(True)
 
     def run(self):
         self._run_telnet_connection()
@@ -126,7 +124,6 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.statusBar().showMessage('Aplication will now exit.')
         time.sleep(1)
         quit()
-
 
     def startTelnetTreading(self):
         _com = str(self.lineEditCommand.text())
