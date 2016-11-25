@@ -1,0 +1,4 @@
+<Setup>
+<port>2323</port>
+<command>vpush</command>
+</Setup>

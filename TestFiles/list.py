@@ -1,8 +1,9 @@
+friends = ['Joseph', 'Glen', 'Sally']
+hpB = 'Happy BroadSigning, '
+for i in friends:
+    print(hpB + i)
 
+print(hpB + friends[0])
+print(hpB + friends[1])
+print(hpB + friends[2])
 
-lst = ['Item_1', 'Item_2', 'Item_3', 'Item_4']
-
-print("first item is: {}".format(lst[0]))
-print("second item is: {}".format(lst[1]))
-print("third item is: {}".format(lst[2]))
-print("forth item is: {}".format(lst[3]))

@@ -1,12 +1,5 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'MyPythonWindow.ui'
-#
-# Created by: PyQt5 UI code generator 5.7
-#
-# WARNING! All changes made in this file will be lost!
-
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -20,20 +13,7 @@ class Ui_MainWindow(object):
         MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setMinimumSize(QtCore.QSize(680, 482))
         MainWindow.setMaximumSize(QtCore.QSize(680, 482))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(10)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setUnderline(False)
-        font.setWeight(50)
-        font.setStrikeOut(False)
-        font.setKerning(True)
-        MainWindow.setFont(font)
         MainWindow.setFocusPolicy(QtCore.Qt.NoFocus)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("Icon-Console.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
         MainWindow.setLayoutDirection(QtCore.Qt.LeftToRight)
         MainWindow.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -44,9 +24,6 @@ class Ui_MainWindow(object):
         self.centralwidget.setSizePolicy(sizePolicy)
         self.centralwidget.setMinimumSize(QtCore.QSize(670, 460))
         self.centralwidget.setMaximumSize(QtCore.QSize(670, 460))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        self.centralwidget.setFont(font)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -86,11 +63,6 @@ class Ui_MainWindow(object):
         self.lineEditHost.setSizePolicy(sizePolicy)
         self.lineEditHost.setMinimumSize(QtCore.QSize(313, 27))
         self.lineEditHost.setMaximumSize(QtCore.QSize(313, 27))
-        self.lineEditHost.setToolTip("")
-        self.lineEditHost.setStatusTip("")
-        self.lineEditHost.setWhatsThis("")
-        self.lineEditHost.setAccessibleName("")
-        self.lineEditHost.setAccessibleDescription("")
         self.lineEditHost.setText("")
         self.lineEditHost.setObjectName("lineEditHost")
         self.rightTopLayout.addWidget(self.lineEditHost)
@@ -207,12 +179,12 @@ class Ui_MainWindow(object):
         self.gridLayout.addLayout(self.rightTopLayout, 1, 1, 1, 1)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.buttonLoadFile = QtWidgets.QPushButton(self.tabSetup)
-        self.buttonLoadFile.setObjectName("buttonLoadFile")
-        self.horizontalLayout.addWidget(self.buttonLoadFile)
         self.buttonSaveToFile = QtWidgets.QPushButton(self.tabSetup)
         self.buttonSaveToFile.setObjectName("buttonSaveToFile")
         self.horizontalLayout.addWidget(self.buttonSaveToFile)
+        self.buttonLoadFile = QtWidgets.QPushButton(self.tabSetup)
+        self.buttonLoadFile.setObjectName("buttonLoadFile")
+        self.horizontalLayout.addWidget(self.buttonLoadFile)
         self.gridLayout.addLayout(self.horizontalLayout, 2, 0, 1, 1)
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem1, 3, 1, 1, 1)
@@ -238,8 +210,6 @@ class Ui_MainWindow(object):
         self.listView.setSizePolicy(sizePolicy)
         self.listView.setMinimumSize(QtCore.QSize(315, 300))
         self.listView.setMaximumSize(QtCore.QSize(315, 300))
-        self.listView.setWhatsThis("")
-        self.listView.setInputMethodHints(QtCore.Qt.ImhNone)
         self.listView.setFrameShape(QtWidgets.QFrame.WinPanel)
         self.listView.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.listView.setLineWidth(2)
@@ -289,6 +259,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Telnet Tools"))
         self.lineEditHost.setPlaceholderText(_translate("MainWindow", "hostname"))
+        self.lineEditHost
         self.buttonAddItemToList.setText(_translate("MainWindow", "Add Host"))
         self.buttonRemoveItemFromList.setText(_translate("MainWindow", "Remove Host"))
         self.labelCount.setText(_translate("MainWindow", "Poll Count"))
@@ -297,8 +268,9 @@ class Ui_MainWindow(object):
         self.lineEditCommand.setPlaceholderText(_translate("MainWindow", "Telnet Command"))
         self.buttonStartTelnet.setText(_translate("MainWindow", "Send Command"))
         self.buttonStopTelnet.setText(_translate("MainWindow", "Stop Execution"))
-        self.buttonLoadFile.setText(_translate("MainWindow", "Load Ip List"))
-        self.buttonSaveToFile.setText(_translate("MainWindow", "Load Config"))
+        self.buttonStopTelnet.setEnabled(False)
+        self.buttonSaveToFile.setText(_translate("MainWindow", "Save list to file"))
+        self.buttonLoadFile.setText(_translate("MainWindow", "Load File"))
         self.buttonCancel.setText(_translate("MainWindow", "Exit Application"))
         self.checkBoxCheckAll.setText(_translate("MainWindow", "Check/Uncheck All"))
         self.checkBoxDoNothing.setText(_translate("MainWindow", "Check Box"))

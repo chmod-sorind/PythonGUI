@@ -8,6 +8,7 @@ import sys
 import telnetlib
 import time
 import MyPythonWindow
+import xml.etree.ElementTree as ET
 
 
 class newTelnetThread(QThread):
@@ -30,6 +31,7 @@ class newTelnetThread(QThread):
         self.wait()
 
     def _run_telnet_connection(self):
+        timeout = 2
         count = self.telnetParams[0]
         rate = self.telnetParams[1]
         port = self.telnetParams[2]
@@ -38,7 +40,7 @@ class newTelnetThread(QThread):
         for pollNum in range(1, count + 1):
             for ipHost in self.listOfHosts:
                     try:
-                        telnet = telnetlib.Telnet(ipHost, port)
+                        telnet = telnetlib.Telnet(ipHost, port, timeout)
                         telnet.write((command + '\n').encode('UTF-8'))
                         telnet.close()
                         print(("#{0} Command {1} sent to {2}".format(pollNum, command, ipHost)))
@@ -80,6 +82,7 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.buttonStartTelnet.clicked.connect(self.startTelnetTreading)
         self.buttonStopTelnet.clicked.connect(self.stopTelnetThreading)
         self.buttonLoadFile.clicked.connect(self.openFile)
+        self.buttonSaveToFile.clicked.connect(self.saveConfigFile)
         self.checkBoxCheckAll.stateChanged.connect(self.CheckUncheckAll)
 
     def buttonAddClicked(self):
@@ -151,7 +154,7 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.buttonStartTelnet.setEnabled(True)
 
     def openFile(self):
-        fileName = QFileDialog.getOpenFileName(self, 'Load file')
+        fileName = QFileDialog.getOpenFileName(self, 'Load Ip List...')
         if fileName[0]:
             with open(fileName[0]) as IP_LIST:
                 line = IP_LIST.read().splitlines()
@@ -162,6 +165,18 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
                     item.setCheckable(True)
                     self.model.appendRow(item)
         self.statusBar().showMessage("{} loaded...".format(fileName[0]))
+
+    def saveConfigFile(self):
+        fileName = QFileDialog.getOpenFileName(self, 'Open Config file...')
+        print(fileName)
+        tree = ET.parse(fileName)
+        print(tree)
+        root = tree.getroot()
+        print(fileName)
+        for nodes in root.findall('node'):
+            port = nodes.attrib.get('port')
+            command = nodes.attrib.get('command')
+            print(port, command)
 
 
 def main():
