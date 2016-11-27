@@ -1,4 +1,8 @@
+<?xml version="1.0"?>
+
 <Setup>
-<port>2323</port>
-<command>vpush</command>
+    <count value="10" />
+    <rate value="60.0" />
+    <port value="2323" />
+    <command value="vpush"/>
 </Setup>
