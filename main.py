@@ -75,17 +75,19 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
 
         # Button Functionality.
         self.buttonAddItemToList.clicked.connect(self.buttonAddClicked)
-        self.buttonCancel.clicked.connect(self.buttonQuitApp)
         self.buttonRemoveItemFromList.clicked.connect(self.buttonRemoveChecked)
+        self.buttonStopTelnet.clicked.connect(self.stopTelnetThreading)
+        self.checkBoxCheckAll.stateChanged.connect(self.CheckUncheckAll)
+
+        # Host List View.
         self.model = QStandardItemModel(self.listView)
         self.listView.setModel(self.model)
         self.model.setColumnCount(2)
         self.model.setHeaderData(0, Qt.Horizontal, "Host IP")
         self.model.setHeaderData(1, Qt.Horizontal, "Host Port")
+        self.listView.setColumnWidth(0, 250)
+        self.listView.setColumnWidth(1, 50)
 
-        self.buttonStartTelnet.clicked.connect(self.startTelnetTreading)
-        self.buttonStopTelnet.clicked.connect(self.stopTelnetThreading)
-        self.checkBoxCheckAll.stateChanged.connect(self.CheckUncheckAll)
 
     def buttonAddClicked(self):
         # ToDo: Make key ENTER add items to the list.
@@ -95,10 +97,9 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
             item.setText(_getTextFromLineEditHost)
             item.setAccessibleText(_getTextFromLineEditHost)
             item.setCheckable(True)
-            self.model.appendRow(item)
+            self.model.appendRow([item, QStandardItem('2323')])
             self.lineEditHost.clear()
             self.statusBar().showMessage(_getTextFromLineEditHost + ' was added to the list')
-            print(_getTextFromLineEditHost + ' was added to the list')
         else:
             self.statusBar().showMessage('Nothing to add')
 
@@ -125,12 +126,14 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.statusBar().showMessage(sender.text() + ' was pressed')
         print(sender.text() + ' was pressed')
 
-    def buttonQuitApp(self):
+    @QtCore.pyqtSlot()
+    def on_buttonCancel_clicked(self):
         self.statusBar().showMessage('Aplication will now exit.')
         time.sleep(1)
         quit()
 
-    def startTelnetTreading(self):
+    @QtCore.pyqtSlot()
+    def on_buttonStartTelnet_clicked(self):
         _com = str(self.lineEditCommand.text())
         _port = str(self.lineEditPort.text())
         _count = int(self.countBox.text())
@@ -160,14 +163,35 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
     def on_buttonLoadFile_clicked(self):
         fileName = QFileDialog.getOpenFileName(self, 'Load Ip List...')
         if fileName[0]:
-            with open(fileName[0]) as IP_LIST:
-                line = IP_LIST.read().splitlines()
-                for f in line:
-                    item = QStandardItem()
-                    item.setText(f)
-                    item.setAccessibleText(f)
-                    item.setCheckable(True)
-                    self.model.appendRow(item)
+            tree = ET.parse(fileName[0])
+            root = tree.getroot()
+            ip_items = []
+            port_items = []
+            for child_0 in root:
+                if child_0.tag == 'HostPortList':
+                    for child_1 in child_0:
+                        for child_2 in child_1:
+                            if child_2.tag == 'ip':
+                                ip_items.append(child_2.text)
+                            elif child_2.tag == 'port':
+                                port_items.append(child_2.text)
+            no_ip_items = len(ip_items)
+            no_port_items = len(port_items)
+            if no_ip_items == no_port_items:
+                pass
+            else:
+                raise Exception('exception')
+            i = 0
+            while i < no_ip_items:
+                ip_item = QStandardItem()
+                ip_item.setText(ip_items[i])
+                ip_item.setAccessibleText(ip_items[i])
+                ip_item.setCheckable(True)
+                port_item = QStandardItem()
+                port_item.setText(port_items[i])
+                port_item.setAccessibleText(port_items[i])
+                self.model.appendRow([ip_item, port_item])
+                i += 1
         self.statusBar().showMessage("{} loaded...".format(fileName[0]))
 
     @QtCore.pyqtSlot()
