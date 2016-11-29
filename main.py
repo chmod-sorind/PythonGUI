@@ -92,14 +92,22 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
     def buttonAddClicked(self):
         # ToDo: Make key ENTER add items to the list.
         _getTextFromLineEditHost = self.lineEditHost.text()
+        _getTextFromLineEditPort = self.lineEditAddPort.text()
         if _getTextFromLineEditHost:
-            item = QStandardItem()
-            item.setText(_getTextFromLineEditHost)
-            item.setAccessibleText(_getTextFromLineEditHost)
-            item.setCheckable(True)
-            self.model.appendRow([item, QStandardItem('2323')])
-            self.lineEditHost.clear()
-            self.statusBar().showMessage(_getTextFromLineEditHost + ' was added to the list')
+            ip_item = QStandardItem()
+            port_item = QStandardItem()
+            ip_item.setText(_getTextFromLineEditHost)
+            port_item.setText(_getTextFromLineEditPort)
+            ip_item.setAccessibleText(_getTextFromLineEditHost)
+            port_item.setAccessibleText(_getTextFromLineEditPort)
+            ip_item.setCheckable(True)
+            if _getTextFromLineEditPort:
+                self.model.appendRow([ip_item, port_item])
+                self.lineEditHost.clear()
+                self.lineEditAddPort.clear()
+            else:
+                self.model.appendRow([ip_item, QStandardItem('2323')])
+                self.lineEditHost.clear()
         else:
             self.statusBar().showMessage('Nothing to add')
 
