@@ -80,13 +80,13 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.checkBoxCheckAll.stateChanged.connect(self.CheckUncheckAll)
 
         # Host List View.
-        self.model = QStandardItemModel(self.listView)
-        self.listView.setModel(self.model)
+        self.model = QStandardItemModel(self.treeView)
+        self.treeView.setModel(self.model)
         self.model.setColumnCount(2)
         self.model.setHeaderData(0, Qt.Horizontal, "Host IP")
         self.model.setHeaderData(1, Qt.Horizontal, "Host Port")
-        self.listView.setColumnWidth(0, 250)
-        self.listView.setColumnWidth(1, 50)
+        self.treeView.setColumnWidth(0, 250)
+        self.treeView.setColumnWidth(1, 50)
 
 
     def buttonAddClicked(self):
@@ -160,7 +160,7 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         print('Telnet connections have been interrupted...')
 
     @QtCore.pyqtSlot()
-    def on_buttonLoadFile_clicked(self):
+    def on_buttonLoadConigFile_clicked(self):
         fileName = QFileDialog.getOpenFileName(self, 'Load Ip List...')
         if fileName[0]:
             tree = ET.parse(fileName[0])
@@ -175,6 +175,17 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
                                 ip_items.append(child_2.text)
                             elif child_2.tag == 'port':
                                 port_items.append(child_2.text)
+                elif child_0.tag == 'ConnectionParams':
+                    for child_3 in child_0:
+                        print(child_3.tag, child_3.text)
+                        if child_3.tag == 'count':
+                            self.countBox.setValue(int(child_3.text))
+                        if child_3.tag == 'rate':
+                            self.frequencyBox.setValue(float(child_3.text))
+                        if child_3.tag == 'command':
+                            self.lineEditCommand.setText(child_3.text)
+                        if child_3.tag == 'port':
+                            self.lineEditPort.setText(child_3.text)
             no_ip_items = len(ip_items)
             no_port_items = len(port_items)
             if no_ip_items == no_port_items:
@@ -195,32 +206,33 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.statusBar().showMessage("{} loaded...".format(fileName[0]))
 
     @QtCore.pyqtSlot()
-    def on_buttonLoadConfig_clicked(self):
-        fileName = QFileDialog.getOpenFileName(self, 'Open Config file...')
-        self.statusBar().showMessage("{} loaded...".format(fileName[0]))
-        tree = ET.parse(fileName[0])
-        root = tree.getroot()
-        for node in root:
-            if node.tag == 'count':
-                x = node.attrib
-                for item in x.items():
-                    count = int(item[1])
-            if node.tag == 'rate':
-                x = node.attrib
-                for item in x.items():
-                    rate = float(item[1])
-            if node.tag == 'port':
-                x = node.attrib
-                for item in x.items():
-                    port = item[1]
-            if node.tag == 'command':
-                x = node.attrib
-                for item in x.items():
-                    command = item[1]
-        self.countBox.setValue(count)
-        self.frequencyBox.setValue(rate)
-        self.lineEditCommand.setText(command)
-        self.lineEditPort.setText(port)
+    def on_buttonSaveConfigToFile_clicked(self):
+        print('buttonSaveConfigToFile was pressed')
+    #     fileName = QFileDialog.getOpenFileName(self, 'Open Config file...')
+    #     self.statusBar().showMessage("{} loaded...".format(fileName[0]))
+    #     tree = ET.parse(fileName[0])
+    #     root = tree.getroot()
+    #     for node in root:
+    #         if node.tag == 'count':
+    #             x = node.attrib
+    #             for item in x.items():
+    #                 count = int(item[1])
+    #         if node.tag == 'rate':
+    #             x = node.attrib
+    #             for item in x.items():
+    #                 rate = float(item[1])
+    #         if node.tag == 'port':
+    #             x = node.attrib
+    #             for item in x.items():
+    #                 port = item[1]
+    #         if node.tag == 'command':
+    #             x = node.attrib
+    #             for item in x.items():
+    #                 command = item[1]
+    #     self.countBox.setValue(count)
+    #     self.frequencyBox.setValue(rate)
+    #     self.lineEditCommand.setText(command)
+    #     self.lineEditPort.setText(port)
 
 
 def main():
