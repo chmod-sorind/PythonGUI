@@ -3,8 +3,9 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QMessageBox
 import sys
+import re
 import telnetlib
 import time
 import MyPythonWindow
@@ -31,7 +32,7 @@ class newTelnetThread(QThread):
         self.wait()
 
     def _run_telnet_connection(self):
-        timeout = 2
+        telnetTimeout = 2
         count = self.telnetParams[0]
         rate = self.telnetParams[1]
         port = self.telnetParams[2]
@@ -40,7 +41,7 @@ class newTelnetThread(QThread):
         for pollNum in range(1, count + 1):
             for ipHost in self.listOfHosts:
                     try:
-                        telnet = telnetlib.Telnet(ipHost, port, timeout)
+                        telnet = telnetlib.Telnet(ipHost, port, telnetTimeout)
                         telnet.write((command + '\n').encode('UTF-8'))
                         telnet.close()
                         print(("#{0} Command {1} sent to {2}".format(pollNum, command, ipHost)))
@@ -74,7 +75,6 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.setupUi(self)
 
         # Button Functionality.
-        self.buttonAddItemToList.clicked.connect(self.buttonAddClicked)
         self.buttonRemoveItemFromList.clicked.connect(self.buttonRemoveChecked)
         self.buttonStopTelnet.clicked.connect(self.stopTelnetThreading)
         self.checkBoxCheckAll.stateChanged.connect(self.CheckUncheckAll)
@@ -88,26 +88,44 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         self.treeView.setColumnWidth(0, 250)
         self.treeView.setColumnWidth(1, 50)
 
-
-    def buttonAddClicked(self):
+    @QtCore.pyqtSlot()
+    def on_buttonAddItemToList_clicked(self):
         # ToDo: Make key ENTER add items to the list.
         _getTextFromLineEditHost = self.lineEditHost.text()
         _getTextFromLineEditPort = self.lineEditAddPort.text()
         if _getTextFromLineEditHost:
-            ip_item = QStandardItem()
-            port_item = QStandardItem()
-            ip_item.setText(_getTextFromLineEditHost)
-            port_item.setText(_getTextFromLineEditPort)
-            ip_item.setAccessibleText(_getTextFromLineEditHost)
-            port_item.setAccessibleText(_getTextFromLineEditPort)
-            ip_item.setCheckable(True)
-            if _getTextFromLineEditPort:
-                self.model.appendRow([ip_item, port_item])
-                self.lineEditHost.clear()
-                self.lineEditAddPort.clear()
+            ip_regex = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"
+            ip_pattern = re.compile(ip_regex)
+            if ip_pattern.match(_getTextFromLineEditHost):
+                ip_item = QStandardItem()
+                port_item = QStandardItem()
+                ip_item.setText(_getTextFromLineEditHost)
+                port_item.setText(_getTextFromLineEditPort)
+                ip_item.setAccessibleText(_getTextFromLineEditHost)
+                port_item.setAccessibleText(_getTextFromLineEditPort)
+                ip_item.setCheckable(True)
+                if _getTextFromLineEditPort:
+                    port_regex = r"\d{1,5}"
+                    port_pattern = re.compile(port_regex)
+                    if port_pattern.match(_getTextFromLineEditPort):
+                        self.model.appendRow([ip_item, port_item])
+                        self.lineEditHost.clear()
+                        self.lineEditAddPort.clear()
+                    else:
+                        self.lineEditAddPort.setStyleSheet("background-color: rgb(255, 0, 0)")
+                        QtCore.QTimer.singleShot(200, lambda: self.lineEditAddPort.setStyleSheet("background-color: rgb(255, 255, 255)"))
+                        QtCore.QTimer.singleShot(500, lambda: self.lineEditAddPort.setStyleSheet("background-color: rgb(255, 0, 0)"))
+                        QtCore.QTimer.singleShot(700, lambda: self.lineEditAddPort.setStyleSheet("background-color: rgb(255, 255, 255)"))
+                        #QMessageBox.warning(self, 'Warning!', "<i>{}</i> doesn't look like a port!".format(_getTextFromLineEditPort))
+                else:
+                    self.model.appendRow([ip_item, QStandardItem('2323')])
+                    self.lineEditHost.clear()
             else:
-                self.model.appendRow([ip_item, QStandardItem('2323')])
-                self.lineEditHost.clear()
+                self.lineEditHost.setStyleSheet("background-color: rgb(255, 0, 0)")
+                QtCore.QTimer.singleShot(200, lambda: self.lineEditHost.setStyleSheet("background-color: rgb(255, 255, 255)"))
+                QtCore.QTimer.singleShot(500, lambda: self.lineEditHost.setStyleSheet("background-color: rgb(255, 0, 0)"))
+                QtCore.QTimer.singleShot(700, lambda: self.lineEditHost.setStyleSheet("background-color: rgb(255, 255, 255)"))
+                #QMessageBox.warning(self, 'Warning!', "<i>{}</i> doesn't look like an IP address!".format(_getTextFromLineEditHost))
         else:
             self.statusBar().showMessage('Nothing to add')
 
@@ -155,12 +173,15 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
             if ipItem.checkState() == QtCore.Qt.Checked:
                 ipHosts_list.append(ipItemText)
 
-        self.get_thread = newTelnetThread(telnetParams_list, ipHosts_list)
-        self.get_thread.start()
-        self.buttonStopTelnet.setEnabled(True)
-        self.get_thread.finishedSignal.connect(self.stopTelnetThreading)
-        self.buttonStopTelnet.clicked.connect(self.get_thread.terminate)
-        self.buttonStartTelnet.setEnabled(False)
+        if _port and _com:
+            self.get_thread = newTelnetThread(telnetParams_list, ipHosts_list)
+            self.get_thread.start()
+            self.buttonStopTelnet.setEnabled(True)
+            self.get_thread.finishedSignal.connect(self.stopTelnetThreading)
+            self.buttonStopTelnet.clicked.connect(self.get_thread.terminate)
+            self.buttonStartTelnet.setEnabled(False)
+        else:
+            QMessageBox.warning(self, 'Warning!', "Check your connection params...")
 
     def stopTelnetThreading(self):
         self.buttonStopTelnet.setEnabled(False)
@@ -185,7 +206,6 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
                                 port_items.append(child_2.text)
                 elif child_0.tag == 'ConnectionParams':
                     for child_3 in child_0:
-                        print(child_3.tag, child_3.text)
                         if child_3.tag == 'count':
                             self.countBox.setValue(int(child_3.text))
                         if child_3.tag == 'rate':
