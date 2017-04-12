@@ -500,6 +500,7 @@
               <property name="font">
                <font>
                 <family>Consolas</family>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="whatsThis">
@@ -690,7 +691,14 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

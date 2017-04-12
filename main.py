@@ -1,3 +1,12 @@
+def install_lib(package):
+    import importlib
+    try:
+        importlib.import_module(package)
+    except ImportError:
+        import pip
+        pip.main(['install', package])
+
+install_lib('PyQt5')
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtCore import QThread, pyqtSignal
@@ -8,8 +17,8 @@ import sys
 import re
 import telnetlib
 import time
-import MyPythonWindow
 import xml.etree.ElementTree as ET
+import MyPythonWindow
 
 
 class newTelnetThread(QThread):
@@ -94,7 +103,7 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
         _getTextFromLineEditHost = self.lineEditHost.text()
         _getTextFromLineEditPort = self.lineEditAddPort.text()
         if _getTextFromLineEditHost:
-            ip_regex = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"
+            ip_regex = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"   # ToDO: Fix_Bug: pattern matches regex but also allows adding pattern followed by extra characters. i.E: 10.10.110.1Test
             ip_pattern = re.compile(ip_regex)
             if ip_pattern.match(_getTextFromLineEditHost):
                 ip_item = QStandardItem()
@@ -105,26 +114,26 @@ class MyApp(QtWidgets.QMainWindow, MyPythonWindow.Ui_MainWindow):
                 port_item.setAccessibleText(_getTextFromLineEditPort)
                 ip_item.setCheckable(True)
                 if _getTextFromLineEditPort:
-                    port_regex = r"\d{1,5}"
+                    port_regex = r"\d{1,5}"  # ToDO: Fix_Bug: pattern matches regex but also allows adding pattern followed by extra characters. i.E: 2323Test
                     port_pattern = re.compile(port_regex)
                     if port_pattern.match(_getTextFromLineEditPort):
                         self.model.appendRow([ip_item, port_item])
                         self.lineEditHost.clear()
                         self.lineEditAddPort.clear()
                     else:
-                        self.lineEditAddPort.setStyleSheet("background-color: rgb(255, 0, 0)")
-                        QtCore.QTimer.singleShot(200, lambda: self.lineEditAddPort.setStyleSheet("background-color: rgb(255, 255, 255)"))
-                        QtCore.QTimer.singleShot(500, lambda: self.lineEditAddPort.setStyleSheet("background-color: rgb(255, 0, 0)"))
-                        QtCore.QTimer.singleShot(700, lambda: self.lineEditAddPort.setStyleSheet("background-color: rgb(255, 255, 255)"))
-                        #QMessageBox.warning(self, 'Warning!', "<i>{}</i> doesn't look like a port!".format(_getTextFromLineEditPort))
+                        self.lineEditAddPort.setStyleSheet("background-color: rgb(255, 0, 0); font: 10pt 'Consolas'")
+                        QtCore.QTimer.singleShot(200, lambda: self.lineEditAddPort.setStyleSheet("background-color: rgb(255, 255, 255); font: 10pt 'Consolas'"))
+                        QtCore.QTimer.singleShot(500, lambda: self.lineEditAddPort.setStyleSheet("background-color: rgb(255, 0, 0); font: 10pt 'Consolas'"))
+                        QtCore.QTimer.singleShot(700, lambda: self.lineEditAddPort.setStyleSheet("background-color: rgb(255, 255, 255); font: 10pt 'Consolas'"))
+                        # QMessageBox.warning(self, 'Warning!', "<i>{}</i> doesn't look like a port!".format(_getTextFromLineEditPort))
                 else:
                     self.model.appendRow([ip_item, QStandardItem('2323')])
                     self.lineEditHost.clear()
             else:
-                self.lineEditHost.setStyleSheet("background-color: rgb(255, 0, 0)")
-                QtCore.QTimer.singleShot(200, lambda: self.lineEditHost.setStyleSheet("background-color: rgb(255, 255, 255)"))
-                QtCore.QTimer.singleShot(500, lambda: self.lineEditHost.setStyleSheet("background-color: rgb(255, 0, 0)"))
-                QtCore.QTimer.singleShot(700, lambda: self.lineEditHost.setStyleSheet("background-color: rgb(255, 255, 255)"))
+                self.lineEditHost.setStyleSheet("background-color: rgb(255, 0, 0); font: 10pt 'Consolas'")
+                QtCore.QTimer.singleShot(200, lambda: self.lineEditHost.setStyleSheet("background-color: rgb(255, 255, 255); font: 10pt 'Consolas'"))
+                QtCore.QTimer.singleShot(500, lambda: self.lineEditHost.setStyleSheet("background-color: rgb(255, 0, 0); font: 10pt 'Consolas'"))
+                QtCore.QTimer.singleShot(700, lambda: self.lineEditHost.setStyleSheet("background-color: rgb(255, 255, 255); font: 10pt 'Consolas'"))
                 #QMessageBox.warning(self, 'Warning!', "<i>{}</i> doesn't look like an IP address!".format(_getTextFromLineEditHost))
         else:
             self.statusBar().showMessage('Nothing to add')

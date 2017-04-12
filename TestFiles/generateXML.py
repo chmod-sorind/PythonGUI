@@ -11,4 +11,3 @@ xmlRoot.append(xmlCommand)
 xmlPort.text = '2323'
 xmlCommand.text = 'vpush'
 print(eTree.tostring(xmlRoot))
-#tree.write(open(/r, 'setup.xml', 'w'))
